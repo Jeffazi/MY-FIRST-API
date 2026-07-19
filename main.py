@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
+from fastapi import Response
 
 app = FastAPI()
 
@@ -41,6 +42,10 @@ tasks = [
 
 class TaskCreate(BaseModel):
     title: str
+
+class TaskUpdate(BaseModel):
+    title: str
+    done: bool
 
 @app.get("/")
 def home():
@@ -81,7 +86,8 @@ def create_task(task: TaskCreate):
         )
     
     
-    next_id = len(tasks) + 1
+    largest_id = max((task["id"] for task in tasks), default=0)
+    next_id = largest_id + 1
 
 
 
@@ -94,4 +100,51 @@ def create_task(task: TaskCreate):
     tasks.append(new_task)
 
     return new_task
+
+
+@app.put("/tasks/{id}")
+def update_task(id: int, task: TaskUpdate):
+    
+    if task.title.strip() == "":
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Title cannot be empty"
+            }
+        )
+    
+
+    for current_task in tasks:
+        if current_task["id"] == id:
+
+            current_task["title"] = task.title
+            current_task["done"] = task.done
+
+            return current_task
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": f"Task {id} not found"
+        }
+    )
+
+
+@app.delete("/tasks/{id}")
+def delete_task(id: int):
+
+    for current_task in tasks:
+
+        if current_task["id"] == id:
+
+            tasks.remove(current_task)
+
+            return Response(status_code=204)
+
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": f"Task {id} not found"
+        }
+    )
     
