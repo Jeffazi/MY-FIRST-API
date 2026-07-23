@@ -5,7 +5,9 @@ from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel
 from fastapi import Response
 
-app = FastAPI()
+app = FastAPI(title="Task Management API",
+    description="A simple RESTful API for managing tasks using FastAPI.",
+    version="1.0.0")
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
