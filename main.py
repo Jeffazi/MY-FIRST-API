@@ -63,7 +63,9 @@ def health():
 def get_tasks():
     return tasks
 
-@app.get("/tasks/{id}")
+@app.get("/tasks/{id}",
+    summary="Get task by ID",
+    description="Returns the details of a specific task identified by its ID.")
 def get_task(id: int):
     for task in tasks:
         if task["id"] == id:
@@ -75,7 +77,9 @@ def get_task(id: int):
      )
 
 
-@app.post("/tasks", status_code=201)
+@app.post("/tasks", status_code=201,
+    summary="Create a task",
+    description="Creates a new task, assigns it a unique ID, marks it as not completed, and returns the created task.")
 def create_task(task: TaskCreate):
     if task.title.strip() == "":
         return JSONResponse(
@@ -102,7 +106,9 @@ def create_task(task: TaskCreate):
     return new_task
 
 
-@app.put("/tasks/{id}")
+@app.put("/tasks/{id}",
+    summary="Update a task",
+    description="Updates the task identified by its ID and returns the updated task if successful.")
 def update_task(id: int, task: TaskUpdate):
     
     if task.title.strip() == "":
@@ -130,7 +136,9 @@ def update_task(id: int, task: TaskUpdate):
     )
 
 
-@app.delete("/tasks/{id}")
+@app.delete("/tasks/{id}",
+    summary="Delete a task",
+    description="Deletes the task identified by its ID and returns a 204 No Content response if successful.")
 def delete_task(id: int):
 
     for current_task in tasks:
